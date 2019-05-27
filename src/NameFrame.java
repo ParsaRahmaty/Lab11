@@ -9,6 +9,7 @@ public class NameFrame extends JFrame {
     private static final int WIDTH = 300, HEIGHT = 100;
     private JTextField textField;
     private JButton btn;
+    private SwitchFramesListener listener = null;
 
     public NameFrame() throws HeadlessException {
         super();
@@ -24,7 +25,7 @@ public class NameFrame extends JFrame {
         textField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                listener.switchFrames(textField.getText());
             }
         });
         btn = new JButton(LABEL_TXT);
@@ -32,5 +33,9 @@ public class NameFrame extends JFrame {
         add(btn, BorderLayout.PAGE_END);
         add(textField, BorderLayout.CENTER);
         setVisible(true);
+    }
+
+    public void setListener(SwitchFramesListener listener) {
+        this.listener = listener;
     }
 }

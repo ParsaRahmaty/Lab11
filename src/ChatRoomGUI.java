@@ -15,7 +15,7 @@ public class ChatRoomGUI extends JFrame{
     private String username;
     private NewMessageListener listener = null;
 
-    public ChatRoomGUI() {
+    public ChatRoomGUI(String username) {
         super();
         this.setTitle(WINDOWS_TITLE);
         this.setLayout(new BorderLayout());
@@ -25,20 +25,38 @@ public class ChatRoomGUI extends JFrame{
         this.add(new JScrollPane(chatBox), BorderLayout.CENTER);
         this.add(messageArea, BorderLayout.PAGE_END);
         this.add(participantsArea, BorderLayout.WEST);
-        addNewParticipant(username);
+        this.username = username;
         messageArea.getButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 listener.newMessage(messageArea.getTextField().getText());
+                messageArea.getTextField().setText("");
             }
         });
-        this.setVisible(true);
-    }
+        messageArea.getTextField().addActionListener(messageArea.getButton().getActionListeners()[0]);
+        messageArea.getTextField().addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                messageArea.getTextField().setText("");
+            }
 
-    public ChatRoomGUI(String username) {
-        this();
-        this.username = username;
-        addNewParticipant(username);
+            @Override
+            public void mousePressed(MouseEvent e) {
+                messageArea.getTextField().setText("");
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                messageArea.getTextField().setText("Write your message...");
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+        this.setVisible(true);
     }
 
     public void addNewMessageListener(NewMessageListener listener){
@@ -57,26 +75,7 @@ public class ChatRoomGUI extends JFrame{
         participantsArea.getModel().removeElement(username);
     }
 
-    private class AbstractMouseListener implements MouseListener {
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            messageArea.getTextField().setText("");
-        }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            messageArea.getTextField().setText("");
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            messageArea.getTextField().setText("Write your message...");
-        }
-
-        @Override
-        public void mouseEntered(MouseEvent e) {}
-
-        @Override
-        public void mouseExited(MouseEvent e) {}
+    public String getUsername() {
+        return username;
     }
 }
