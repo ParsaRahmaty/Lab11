@@ -11,7 +11,7 @@ public class Logic {
             public void switchFrames(String username) {
                 nameFrame.dispose();
                 chatRoom = new ChatRoomGUI(username);
-                chatRoom.addNewParticipant(username);
+                chatRoom.addOnlineUser(username);
                 chatRoom.addNewMessageListener(new NewMessageListener() {
                     @Override
                     public void newMessage(String message) {

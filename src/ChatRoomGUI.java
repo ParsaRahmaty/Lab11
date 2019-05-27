@@ -1,9 +1,14 @@
+import network.ClientListener;
+import network.Communicator;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class ChatRoomGUI extends JFrame{
     private final String WINDOWS_TITLE = "AUT Chat Room";
@@ -14,9 +19,14 @@ public class ChatRoomGUI extends JFrame{
     private ParticipantsArea participantsArea = new ParticipantsArea();
     private String username;
     private NewMessageListener listener = null;
+    private ArrayList<String> onlineUsers;
+    private Communicator communicator;
+    private ClientListener clientListener = null;
 
     public ChatRoomGUI(String username) {
         super();
+        onlineUsers = new ArrayList<>();
+        communicator = new Communicator();
         this.setTitle(WINDOWS_TITLE);
         this.setLayout(new BorderLayout());
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -28,8 +38,13 @@ public class ChatRoomGUI extends JFrame{
         this.username = username;
         messageArea.getButton().addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent e){
                 listener.newMessage(messageArea.getTextField().getText());
+                try {
+                    communicator.sendMessage(messageArea.getTextField().getText());
+                } catch (IOException exception) {
+                    exception.printStackTrace();
+                }
                 messageArea.getTextField().setText("");
             }
         });
@@ -67,15 +82,39 @@ public class ChatRoomGUI extends JFrame{
         chatBox.addMessage(username, message);
     }
 
-    public void  addNewParticipant(String username) {
-        participantsArea.addUser(username);
+    public void  addOnlineUser(String username) {
+        if (!onlineUsers.contains(username)) {
+            onlineUsers.add(username);
+            participantsArea.addUser(username);
+        } else {
+            System.out.println("ERROR: User is already online.");
+        }
     }
 
-    public void removeParticipant(String username) {
-        participantsArea.getModel().removeElement(username);
+    public void removeOnlineUser(String username) {
+        if (onlineUsers.contains(username)) {
+            onlineUsers.remove(username);
+            participantsArea.getModel().removeElement(username);
+        } else {
+            System.out.println("ERROR: User is not online.");
+        }
     }
 
     public String getUsername() {
         return username;
+    }
+
+    public void setOnlineUsers(ArrayList<String> onlineUsers) {
+        this.onlineUsers = onlineUsers;
+        participantsArea.getModel().removeAllElements();
+        participantsArea.addUser(this.username);
+        for (String username : onlineUsers) {
+            if (!username.equals(this.username))
+                participantsArea.addUser(username);
+        }
+    }
+
+    public ArrayList<String> getOnlineUsers() {
+        return onlineUsers;
     }
 }
